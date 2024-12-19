@@ -14,11 +14,14 @@ class Task(BaseModel):
 
     REDIS_PREFIX = "task"
 
-    def __init__(self, chat_id: int, user_id: int, username: str, title: str, message_id: int, key: str = None):
+    def __init__(self, chat_id: int, chat_title: str, user_id: int, username: str, title: str, description: str, message_id: int,
+                 key: str = None):
         self.chat_id = chat_id
+        self.chat_title = chat_title
         self.user_id = user_id
         self.username = username
         self.title = title
+        self.description = description
         self.message_id = message_id
         self.messages = []
         self.attachments = []
@@ -29,11 +32,13 @@ class Task(BaseModel):
         """Конвертирует объект в словарь для Redis"""
         return {
             "chat_id": self.chat_id,
+            "chat_title": self.chat_title,
             "user_id": self.user_id,
             "username": self.username,
             "title": self.title,
+            "description": self.description,
             "message_id": self.message_id,
-            "messages": json.dumps(self.messages),
+            "messages": json.dumps([Message.to_dict(i) for i in self.messages]),
             "attachments": json.dumps(self.attachments),
             "created_at": self.created_at,
         }
@@ -43,9 +48,11 @@ class Task(BaseModel):
         """Создаёт объект из словаря"""
         task = cls(
             user_id=int(data["user_id"]),
+            chat_title=data["chat_title"],
             chat_id=int(data["chat_id"]),
             username=data["username"],
             title=data["title"],
+            description=data["description"],
             message_id=data["message_id"],
             key=data.get("key"),
         )
@@ -61,9 +68,11 @@ class Task(BaseModel):
         return {
             "key": self.key,
             "chat_id": self.chat_id,
+            "chat_title": self.chat_title,
             "user_id": self.user_id,
             "username": self.username,
             "title": self.title,
+            "description": self.description,
             "message_id": self.message_id,
             "messages": self.messages,
             "attachments": self.attachments,
@@ -126,12 +135,9 @@ class Task(BaseModel):
     def add_message(self, message):
         """Добавляет сообщение в задачу"""
         updated_task = self.get(self.key)
+        self.messages.append(message)
+        messages = []
         if updated_task:
-            self.messages = [Message.to_dict(i) for i in updated_task.messages]
-        if not isinstance(self.messages, list):
-            self.messages = []
-        self.messages.append(message.to_dict())
-        self._update_redis_field('messages', self.messages)
-
-
-
+            messages = [Message.to_dict(i) for i in updated_task.messages]
+        messages.append(message.to_dict())
+        self._update_redis_field('messages', messages)
