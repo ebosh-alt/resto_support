@@ -52,15 +52,14 @@ async def test():
     tasks = await client.create_task(task, "test", "s")
     logger.info(tasks)
 
-# logger.info(upload_file)
 if __name__ == "__main__":
     logging.basicConfig(
         level=logging.INFO,
-        # filename="log.logging",
+        filename="log.logging",
         format="%(filename)s:%(lineno)d #%(levelname)-3s [%(asctime)s] - %(message)s",
         filemode="w",
         encoding="utf-8",
     )
 
     with suppress(KeyboardInterrupt):
-        asyncio.run(test())
+        asyncio.run(main())
