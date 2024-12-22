@@ -72,7 +72,6 @@ async def wait_for_followup(key: str):
 
     # Получаем задачу из Redis
     task = Task.get(key)
-    logger.info(task)
     if task:
         # Обновляем описание задачи новыми сообщениями
         task_title = " ".join(task.description.split()[:10])
@@ -83,6 +82,7 @@ async def wait_for_followup(key: str):
                                text=f"✅ Ваш запрос отправлен в службу поддержки, мы ответим в течение {RESPONSE_TIME}.",
                                reply_to_message_id=task.message_id)
         client = ClientBitrix()
+        logger.info(task.to_dict())
         task_btx = await client.create_task(task,
                                             link=f"https://t.me/c/{str(task.chat_id).replace("-100", "")}/{task.message_id}",
                                             chat_title=task.chat_title)
