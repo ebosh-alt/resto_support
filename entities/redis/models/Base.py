@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 class BaseModel:
     """Базовая модель для работы с Redis"""
-    TTL = WAIT_TIME  # Время жизни записи в Redis (в секундах)
+    TTL = 200  # Время жизни записи в Redis (в секундах)
     REDIS_PREFIX = "model"
 
     def __init__(self, key: str = None):
