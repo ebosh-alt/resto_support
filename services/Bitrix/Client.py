@@ -1,6 +1,8 @@
 import base64
+import json
 import logging
 from datetime import datetime
+from xml.etree.ElementTree import indent
 
 from entities.models import ResponseTask, ApiPoint, RequestTask, UploadFile, FileDetails
 from entities.redis.models.Task import Task
@@ -38,8 +40,9 @@ class ClientBitrix(BaseClient):
         params = {
             'fields': task.model_dump()
         }
-
+        logger.info(task.to_dict())
         response = await self._get(ApiPoint.createTask, params=params)
+        logger.info(json.dumps(response, indent=4, ensure_ascii=False))
         if response.get("error"):
             return False
         return ResponseTask(**response["result"]["task"])
