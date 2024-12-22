@@ -14,14 +14,14 @@ services:
     networks:
       - app_network
 
-
   redis:
     image: redis:alpine
     container_name: redis_server
     ports:
       - "6379:6379"
-
+    networks:
+      - app_network
 
 networks:
   app_network:
-    driver: host
+    driver: bridge  # Используем тип bridge, вместо host
