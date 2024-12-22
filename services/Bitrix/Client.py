@@ -16,13 +16,13 @@ class ClientBitrix(BaseClient):
         super().__init__()
 
     async def get_fields_task(self):
-        response = self._get(ApiPoint.taskGetFields)
+        response = await self._get(ApiPoint.taskGetFields)
         if response.get("status") == "success":
             return True
         return response["result"]["fields"]
 
     async def get_list_task(self) -> list[ResponseTask] | bool:
-        response = self._get(ApiPoint.listTask)
+        response = await self._get(ApiPoint.listTask)
         if response.get("error"):
             return False
         list_task = []
@@ -41,7 +41,7 @@ class ClientBitrix(BaseClient):
             'fields': task.model_dump()
         }
         logger.info(task)
-        response = self._get(ApiPoint.createTask, params=params)
+        response = await self._get(ApiPoint.createTask, params=params)
         logger.info(json.dumps(response, indent=4, ensure_ascii=False))
         if response.get("error"):
             return False
@@ -67,7 +67,7 @@ class ClientBitrix(BaseClient):
         result = []
         for id_file in id_files:
             params.update({"fileId": id_file})
-            response = self._get(ApiPoint.filesAttach, params=params)
+            response = await self._get(ApiPoint.filesAttach, params=params)
             result.append(response)
         return result
 
@@ -79,7 +79,7 @@ class ClientBitrix(BaseClient):
         return files_detail
 
     async def storage_get_list(self):
-        response = self._get(ApiPoint.storageGetlist)
+        response = await self._get(ApiPoint.storageGetlist)
         if response.get("status") == "success":
             return True
         return response
