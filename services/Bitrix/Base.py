@@ -63,7 +63,7 @@ class BaseClient:
         return data
 
     async def _get(self, url: str, params: dict | list[dict] = None):
-        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
+        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector()) as session:
             # Выполняем GET-запрос
             params = self._prepare_params(params)
             async with session.get(url=url, params=params) as response:
