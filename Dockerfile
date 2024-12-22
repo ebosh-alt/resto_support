@@ -8,7 +8,7 @@ WORKDIR /app
 COPY requirements.txt .
 
 # Устанавливаем зависимости
-RUN pip install --no-cache-dir -r requirements.txt -i https://mirrors.cloud.tencent.com/pypi/simple/
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Копируем все файлы проекта в контейнер
 COPY . .
