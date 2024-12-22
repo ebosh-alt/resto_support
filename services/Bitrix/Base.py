@@ -69,7 +69,7 @@ class BaseClient:
         # logger.info(params)
         # Выполняем GET-запрос
         try:
-            response = requests.get(url, params=params)
+            response = requests.get(url, params=params, timeout=10)
 
             # Проверяем статус ответа
             if response.status_code == 200:
