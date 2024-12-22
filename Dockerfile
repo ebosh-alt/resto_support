@@ -8,7 +8,8 @@ WORKDIR /app
 COPY requirements.txt .
 
 # Устанавливаем зависимости
-RUN pip install --no-cache-dir --default-timeout=100 -r requirements.txt
+COPY ./packages /packages
+RUN pip install --no-cache-dir /packages/*
 
 # Копируем все файлы проекта в контейнер
 COPY . .
