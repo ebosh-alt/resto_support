@@ -80,7 +80,7 @@ class BaseClient:
                 logger.info(f"Error in response from {url}, status: {response.status_code}\nparams: {params}")
 
         except requests.exceptions.RequestException as e:
-            logger.error(f"An error occurred while making the request: {e}")
+            logger.info(f"An error occurred while making the request: {e}")
             data = None
 
         # Возвращаем данные
