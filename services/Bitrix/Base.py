@@ -2,6 +2,7 @@ import logging
 from typing import Any
 
 import aiohttp
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -63,6 +64,29 @@ class BaseClient:
         return data
 
     async def _get(self, url: str, params: dict | list[dict] = None):
+        # Подготовка параметров
+        params = self._prepare_params(params)
+        logger.info(params)
+        # Выполняем GET-запрос
+        try:
+            response = requests.get(url, params=params)
+
+            # Проверяем статус ответа
+            if response.status_code == 200:
+                data = response.json()
+                logger.info(f"Successfully got response from {url}, status: {response.status_code}\nparams: {params}")
+            else:
+                data = response.text
+                logger.info(f"Error in response from {url}, status: {response.status_code}\nparams: {params}")
+
+        except requests.exceptions.RequestException as e:
+            logger.error(f"An error occurred while making the request: {e}")
+            data = None
+
+        # Возвращаем данные
+        return data
+
+    async def _get_async(self, url: str, params: dict | list[dict] = None):
         async with aiohttp.ClientSession(connector=aiohttp.TCPConnector()) as session:
             # Выполняем GET-запрос
             params = self._prepare_params(params)

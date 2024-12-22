@@ -9,7 +9,7 @@ dp = Dispatcher()
 bot = Bot(bot_token)
 REDIS_HOST = "localhost"
 REDIS_PORT = 6379
-WAIT_TIME = 20  # Настроить по необходимости
+WAIT_TIME = 2  # Настроить по необходимости
 RESPONSE_TIME = "5 минут"  # Настроить по необходимости
 USERNAME_BOT = "@ooo_osbot"
 
