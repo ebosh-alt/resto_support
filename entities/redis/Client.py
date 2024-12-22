@@ -5,7 +5,7 @@ class RedisClient:
     """Подключение к Redis и управление соединением"""
 
     _instance = None
-    host = "redis_server"
+    host = "localhost"
     port = 6379
 
     def __new__(cls, *args, **kwargs):
