@@ -11,10 +11,18 @@ services:
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-    command: python main.py
+    networks:
+      - app_network
+
 
   redis:
     image: redis:alpine
     container_name: redis_server
     ports:
       - "6379:6379"
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
