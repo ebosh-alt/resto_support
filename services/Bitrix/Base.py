@@ -66,7 +66,7 @@ class BaseClient:
     def _get(self, url: str, params: dict | list[dict] = None):
         # Подготовка параметров
         params = self._prepare_params(params)
-        logger.info(params)
+        # logger.info(params)
         # Выполняем GET-запрос
         try:
             response = requests.get(url, params=params)
