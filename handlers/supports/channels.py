@@ -41,6 +41,7 @@ async def handle_message(message: types.Message):
                 f"✅ Вы уже оставили запрос недавно. Подождите немного"
             )
             return
+        logger.info("new task")
         task_title = " ".join(text.split()[:10])
         task = Task(
             chat_id=chat_id,
@@ -53,7 +54,7 @@ async def handle_message(message: types.Message):
         )
         task.save()
         task.add_message(Message(text))
-
+        logger.info("create task")
         await message.reply(
             f"✅ Ваш запрос принят"
         )
