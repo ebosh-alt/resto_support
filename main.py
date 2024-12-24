@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 
 def test_redis():
     s = Task.get_all_by_chat_id(-4709740170)
-    print(s)
     # Создание новой задачи
     # task = Task(chat_id=12345, user_id=123456000, username="username", title="Ошибка на сайте", description="Клиент сообщил о проблеме с доступом.")
     # task.save()

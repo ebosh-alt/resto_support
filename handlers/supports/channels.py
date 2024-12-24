@@ -7,7 +7,7 @@ from data.config import bot, RESPONSE_TIME, USERNAME_BOT, WAIT_TIME
 from entities.redis.models.Message import Message
 from entities.redis.models.Task import Task
 from services.Bitrix.Client import ClientBitrix
-
+from data import texts
 # Логирование
 logger = logging.getLogger(__name__)
 router = Router()
@@ -38,7 +38,7 @@ async def handle_message(message: types.Message):
     if USERNAME_BOT in message.text:
         if Task.exists(f"{Task.REDIS_PREFIX}:{chat_id}:{user_id}"):
             await message.reply(
-                f"✅ Вы уже оставили запрос недавно. Подождите немного"
+                texts.request_left
             )
             return
         logger.info("new task")
@@ -56,7 +56,7 @@ async def handle_message(message: types.Message):
         task.add_message(Message(text))
         logger.info("create task")
         await message.reply(
-            f"✅ Ваш запрос принят"
+            texts.request_adopted
         )
         await wait_for_followup(key=task.key)
     else:
@@ -80,7 +80,7 @@ async def wait_for_followup(key: str):
         task.description += f"\nСсылка на главное сообщение: https://t.me/c/{str(task.chat_id).replace("-100", "")}/{task.message_id}"
         task.save()
         await bot.send_message(chat_id=task.chat_id,
-                               text=f"✅ Ваш запрос отправлен в службу поддержки, мы ответим в течение {RESPONSE_TIME}.",
+                               text=texts.request_sent,
                                reply_to_message_id=task.message_id)
         client = ClientBitrix()
         logger.info(task.to_dict())
