@@ -4,7 +4,7 @@ import logging
 from aiogram import types, Router, F
 
 from data import texts
-from data.config import bot, USERNAME_BOT
+from data.config import bot, USERNAME_BOT, WAIT_TIME
 from entities.database import tasks, Task as TaskDB
 from entities.redis.models.message import Message
 from entities.redis.models.tasks import Task
@@ -77,7 +77,7 @@ async def handle_message(message: types.Message):
 
 async def wait_for_followup(key: str):
     """Ожидание дополнительных сообщений и вложений в течение WAIT_TIME секунд"""
-    await asyncio.sleep(10)  # ожидание
+    await asyncio.sleep(WAIT_TIME)  # ожидание
 
     # Получаем задачу из Redis
     task = Task.get(key)
