@@ -20,7 +20,7 @@ class RedisConfig(ConfigBase):
     port: int
 
 
-class ApiConfig(BaseSettings):
+class ApiConfig(ConfigBase):
     model_config = SettingsConfigDict(env_prefix="api_")
     host: str
 

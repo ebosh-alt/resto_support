@@ -9,7 +9,7 @@ class RedisClient:
     _instance = None
 
     def __new__(cls, *args, **kwargs):
-        config = Config()
+        config = Config.load()
         if not cls._instance:
             cls._instance = super().__new__(cls)
             cls._instance.connection = redis.Redis(

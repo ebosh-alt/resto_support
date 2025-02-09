@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field, model_validator
 
 from data.settings.setting import Config
 
-config = Config()
+config = Config.load()
 
 @dataclass
 class ApiPoint:
