@@ -2,10 +2,9 @@ import base64
 import json
 import logging
 from datetime import datetime
-from xml.etree.ElementTree import indent
 
 from entities.models import ResponseTask, ApiPoint, RequestTask, UploadFile, FileDetails
-from entities.redis.models.Task import Task
+from entities.redis.models.tasks import Task
 from services.Bitrix.Base import BaseClient
 
 logger = logging.getLogger(__name__)

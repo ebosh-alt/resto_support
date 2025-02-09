@@ -4,19 +4,20 @@ from typing import Optional, List, Union, Dict
 
 from pydantic import BaseModel, Field, model_validator
 
-from data.config import BASE_URL
+from data.settings.setting import Config
 
+config = Config()
 
 @dataclass
 class ApiPoint:
-    createTask: str = f"{BASE_URL}/tasks.task.add.json"
-    getTask: str = f"{BASE_URL}/tasks.task.get.json"
-    listTask: str = f"{BASE_URL}/tasks.task.list.json"
-    filesAttach: str = f"{BASE_URL}/tasks.task.files.attach.json"
-    taskGetFields: str = f"{BASE_URL}/tasks.task.getFields"
-    addFile: str = f"{BASE_URL}/disk.storage.uploadfile.json"
-    getFile: str = f"{BASE_URL}/disk.file.getfields.json"
-    storageGetlist: str = f"{BASE_URL}/disk.storage.getlist.json"
+    createTask: str = f"{config.api.host}/tasks.task.add.json"
+    getTask: str = f"{config.api.host}/tasks.task.get.json"
+    listTask: str = f"{config.api.host}/tasks.task.list.json"
+    filesAttach: str = f"{config.api.host}/tasks.task.files.attach.json"
+    taskGetFields: str = f"{config.api.host}/tasks.task.getFields"
+    addFile: str = f"{config.api.host}/disk.storage.uploadfile.json"
+    getFile: str = f"{config.api.host}/disk.file.getfields.json"
+    storageGetlist: str = f"{config.api.host}/disk.storage.getlist.json"
 
 
 class Group(BaseModel):

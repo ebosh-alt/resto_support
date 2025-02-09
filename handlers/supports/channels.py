@@ -3,12 +3,13 @@ import logging
 
 from aiogram import types, Router, F
 
-from data.config import bot, RESPONSE_TIME, USERNAME_BOT, WAIT_TIME
-from entities.redis.models.Message import Message
-from entities.redis.models.Task import Task
-from services.Bitrix.Client import ClientBitrix
 from data import texts
-# Логирование
+from data.config import bot, USERNAME_BOT
+from entities.database import tasks, Task as TaskDB
+from entities.redis.models.message import Message
+from entities.redis.models.tasks import Task
+from services.Bitrix.Client import ClientBitrix
+
 logger = logging.getLogger(__name__)
 router = Router()
 
@@ -41,10 +42,17 @@ async def handle_message(message: types.Message):
                 texts.request_left
             )
             return
-        logger.info("new task")
         task_title = " ".join(text.split()[:10])
+        task_db = TaskDB(
+            title=task_title,
+            description=text,
+        )
+        await tasks.new(task_db)
+        task_title = f"№{task_db.id:09d}. {task_title}"
+
         task = Task(
             chat_id=chat_id,
+            db_id=task_db.id,
             chat_title=message.chat.title,
             user_id=user_id,
             username=user_name,
@@ -54,9 +62,9 @@ async def handle_message(message: types.Message):
         )
         task.save()
         task.add_message(Message(text))
-        logger.info("create task")
+
         await message.reply(
-            texts.request_adopted
+            texts.request_adopted.format(task_id=task_db.id)
         )
         await wait_for_followup(key=task.key)
     else:
@@ -69,26 +77,23 @@ async def handle_message(message: types.Message):
 
 async def wait_for_followup(key: str):
     """Ожидание дополнительных сообщений и вложений в течение WAIT_TIME секунд"""
-    await asyncio.sleep(WAIT_TIME)  # ожидание
+    await asyncio.sleep(10)  # ожидание
 
     # Получаем задачу из Redis
     task = Task.get(key)
     if task:
-        # Обновляем описание задачи новыми сообщениями
-        task_title = " ".join(task.description.split()[:10])
+        task_title = f"№{task.db_id:09d}. {" ".join(task.description.split()[:10])}"
         task.title = task_title
         task.description += f"\nСсылка на главное сообщение: https://t.me/c/{str(task.chat_id).replace("-100", "")}/{task.message_id}"
         task.save()
-        await bot.send_message(chat_id=task.chat_id,
-                               text=texts.request_sent,
-                               reply_to_message_id=task.message_id)
+        # await bot.send_message(chat_id=task.chat_id,
+        #                        text=texts.request_sent,
+        #                        reply_to_message_id=task.message_id)
         client = ClientBitrix()
-        logger.info(task.to_dict())
         task_btx = await client.create_task(task,
                                             link=f"https://t.me/c/{str(task.chat_id).replace("-100", "")}/{task.message_id}",
                                             chat_title=task.chat_title)
-
-        logger.info(task_btx)
+        logger.info(f"Task send {task.title}")
         if task_btx:
             if task.attachments:
                 files_detail = await client.add_files(task.attachments)
@@ -96,8 +101,7 @@ async def wait_for_followup(key: str):
                 ids_files = []
                 for file_detail in files_detail:
                     ids_files.append(file_detail.ID)
-                attachments = await client.attach_files(task_btx.id, ids_files)
-                logger.info(attachments)
+                await client.attach_files(task_btx.id, ids_files)
         task.delete()
 
 

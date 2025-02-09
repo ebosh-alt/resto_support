@@ -1,5 +1,5 @@
-from .users import User, Users
+from .tasks import Task, Tasks
 
-users = Users()
+tasks = Tasks()
 
-__al__ = ("users", "User")
+__al__ = ("tasks", "Task")
