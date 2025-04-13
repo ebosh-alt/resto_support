@@ -1,6 +1,5 @@
-import json
 import logging
-from typing import Any, Sequence, AsyncIterator
+from typing import Any, Sequence, AsyncIterator, TypeVar, Generic, Type, List
 
 from sqlalchemy import select, update, Row
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,6 +16,7 @@ __factory: sessionmaker | None = None
 logger = logging.getLogger(__name__)
 
 config = Config.load()
+T = TypeVar("T", bound=Base)
 
 
 async def create_async_database():
@@ -46,11 +46,9 @@ def get_factory():
     global __factory
     return __factory()
 
-
-class BaseDB:
-    def __init__(self, obj):
+class BaseDB(Generic[T]):
+    def __init__(self, obj: Type[T]):
         self.obj = obj
-        self.path_json = "data/database.json"
 
     @staticmethod  # __table__ = "accounts"
     async def _get_session() -> AsyncSession:
@@ -81,7 +79,7 @@ class BaseDB:
         await session.bind.dispose()
         return result
 
-    async def _get_objects(self, filters: dict | list = None):
+    async def _get_objects(self, filters: dict | list = None) -> List[T]:
         async with await self._get_session() as session:
             sql = select(self.obj)
             if isinstance(filters, dict):
@@ -97,12 +95,8 @@ class BaseDB:
         await session.bind.dispose()
         return result
 
-    async def __aiter__(self) -> AsyncIterator[Any]:
-        """
-        Асинхронный итератор для постраничного получения данных из базы.
-        """
+    async def __aiter__(self) -> AsyncIterator[T]:
         async with await self._get_session() as session:
-            # Создаем запрос с учетом отношений (refs)
             query = select(self.obj)
             for ref in self.obj.refs:
                 query = query.options(selectinload(ref))
@@ -161,20 +155,3 @@ class BaseDB:
             )
             await session.commit()
             return True
-
-    def update_json(self, instance):
-        data = self.get_json()
-        if data.get(self.obj.__tablename__, None) is None:
-            data[self.obj.__tablename__] = []
-        data[self.obj.__tablename__].append(instance.to_json())
-        self.save_json(data)
-        return data
-
-    def get_json(self):
-        with open(self.path_json, "r", encoding="utf-8") as file:
-            data = json.load(file)
-        return data
-
-    def save_json(self, data):
-        with open(self.path_json, "w", encoding="utf-8") as file:
-            json.dump(data, file, ensure_ascii=False, indent=4)

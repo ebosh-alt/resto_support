@@ -65,3 +65,4 @@ photos/*.jpg
 photos/*.png
 
 redisdata/
+log.logging

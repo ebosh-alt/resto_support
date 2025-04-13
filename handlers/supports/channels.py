@@ -29,7 +29,6 @@ async def handle_photo(message: types.Message):
             task.add_attachment(path)
 
 
-# Функция для обработки упоминания бота
 @router.message(F.text)
 async def handle_message(message: types.Message):
     user_name = message.from_user.username
@@ -46,6 +45,8 @@ async def handle_message(message: types.Message):
         task_db = TaskDB(
             title=task_title,
             description=text,
+            chat_id=message.chat.id,
+            message_id=message.message_id
         )
         await tasks.new(task_db)
         task_title = f"№{task_db.id:09d}. {task_title}"
@@ -60,6 +61,7 @@ async def handle_message(message: types.Message):
             description=f"{text}\n",
             message_id=message.message_id
         )
+        logger.info(f"Новая задача {task_db.id}")
         task.save()
         task.add_message(Message(text))
 
@@ -77,27 +79,29 @@ async def handle_message(message: types.Message):
 
 async def wait_for_followup(key: str):
     """Ожидание дополнительных сообщений и вложений в течение WAIT_TIME секунд"""
-    await asyncio.sleep(WAIT_TIME)  # ожидание
+    await asyncio.sleep(WAIT_TIME)
 
-    # Получаем задачу из Redis
     task = Task.get(key)
     if task:
-        task_title = f"№{task.db_id:09d}. {" ".join(task.description.split()[:10])}"
-        task.title = task_title
+        task.title = f"№{task.db_id:09d}. {" ".join(task.description.split()[:10])}"
         task.description += f"\nСсылка на главное сообщение: https://t.me/c/{str(task.chat_id).replace("-100", "")}/{task.message_id}"
         task.save()
-        # await bot.send_message(chat_id=task.chat_id,
-        #                        text=texts.request_sent,
-        #                        reply_to_message_id=task.message_id)
+
         client = ClientBitrix()
         task_btx = await client.create_task(task,
                                             link=f"https://t.me/c/{str(task.chat_id).replace("-100", "")}/{task.message_id}",
                                             chat_title=task.chat_title)
-        logger.info(f"Task send {task.title}")
+
+        task_db = await tasks.get(task.db_id)
+        task_db.btx_id = task_btx.id
+        task_db.stage_id = task_btx.stageId
+        task_db.is_created = True
+        await tasks.update(task_db)
+        logger.info(f"Задача {task_db.id} создана в битриксе")
+
         if task_btx:
             if task.attachments:
                 files_detail = await client.add_files(task.attachments)
-                logger.info(files_detail)
                 ids_files = []
                 for file_detail in files_detail:
                     ids_files.append(file_detail.ID)

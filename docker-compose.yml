@@ -24,4 +24,4 @@ services:
 
 networks:
   app_network:
-    driver: bridge  # Используем тип bridge, вместо host
+    driver: bridge

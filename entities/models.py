@@ -18,6 +18,7 @@ class ApiPoint:
     addFile: str = f"{config.api.host}/disk.storage.uploadfile.json"
     getFile: str = f"{config.api.host}/disk.file.getfields.json"
     storageGetlist: str = f"{config.api.host}/disk.storage.getlist.json"
+    taskUserField: str = f"{config.api.host}/task.item.userfield.get.json"
 
 
 class Group(BaseModel):

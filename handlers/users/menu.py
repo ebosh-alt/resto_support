@@ -6,8 +6,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 
 from data.config import bot
-from services.GetMessage import get_mes
-from services.keyboards import Keyboards
+from services.keyboards import keyboards
 
 
 router = Router()
@@ -21,8 +20,8 @@ async def start(message: Message | CallbackQuery, state: FSMContext):
     await state.clear()
     await bot.send_message(
         chat_id=id,
-        text=get_mes("start_mes"),
-        reply_markup=Keyboards.start_kb,
+        text="Главное меню",
+        reply_markup=keyboards.start,
     )
 
 

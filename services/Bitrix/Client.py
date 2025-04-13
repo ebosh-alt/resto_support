@@ -21,7 +21,11 @@ class ClientBitrix(BaseClient):
         return response["result"]["fields"]
 
     async def get_list_task(self) -> list[ResponseTask] | bool:
-        response = await self._get(ApiPoint.listTask)
+        params = {
+            "order": {"ID": 'desc'}
+        }
+
+        response = await self._get(ApiPoint.listTask, params=params)
         if response.get("error"):
             return False
         list_task = []
@@ -39,9 +43,7 @@ class ClientBitrix(BaseClient):
         params = {
             'fields': task.model_dump()
         }
-        logger.info(task)
         response = await self._get(ApiPoint.createTask, params=params)
-        logger.info(json.dumps(response, indent=4, ensure_ascii=False))
         if response.get("error"):
             return False
         return ResponseTask(**response["result"]["task"])
@@ -90,4 +92,23 @@ class ClientBitrix(BaseClient):
         ...
 
     async def get_task(self, id_task):
-        ...
+        params = {
+            "taskId": id_task,
+        }
+
+        response = await self._get(ApiPoint.getTask, params=params)
+        if response.get("error"):
+            return False
+        task = response["result"]["task"]
+        return ResponseTask(**task)
+
+    async def get_task_user_field(self, id):
+        params = {
+            "ID": id,
+        }
+        response = await self._get(ApiPoint.taskUserField, params=params)
+        logger.info(response)
+        if response.get("error"):
+            return False
+        task = response["result"]["task"]
+        return ResponseTask(**task)

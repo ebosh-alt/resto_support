@@ -1,6 +1,6 @@
 import logging
 
-from sqlalchemy import Column, String, Integer
+from sqlalchemy import Column, String, Integer, Boolean, BigInteger
 
 from .base import Base, BaseDB
 
@@ -15,15 +15,26 @@ class Task(Base):
     id = Column(Integer, autoincrement=True, primary_key=True)
     title = Column(String)
     description = Column(String)
+    chat_id = Column(BigInteger)
+    btx_id = Column(BigInteger, default=0)
+    stage_id = Column(BigInteger, default=0)
+    message_id = Column(BigInteger, default=0)
+    is_created = Column(Boolean, default=False)
+
+    refs = []
 
     def dict(self):
         return {"id": self.id,
                 "title": self.title,
                 "description": self.description,
+                "btx_id": self.btx_id,
+                "stage_id": self.stage_id,
+                "message_id": self.message_id,
+                "is_created": self.is_created,
                 }
 
 
-class Tasks(BaseDB):
+class Tasks(BaseDB[Task]):
     def __init__(self):
         super().__init__(Task)
 
