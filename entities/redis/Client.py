@@ -1,7 +1,7 @@
 import redis
 
 from data.settings.setting import Config
-
+from loguru import logger
 
 class RedisClient:
     """Подключение к Redis и управление соединением"""

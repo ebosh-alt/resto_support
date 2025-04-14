@@ -10,6 +10,7 @@ from entities.database import tasks
 from services.Bitrix.Client import ClientBitrix
 from services.keyboards import keyboards
 
+UTC_TZ = pytz.utc
 MOSCOW_TZ = pytz.timezone("Europe/Moscow")
 logger = logger.bind(name="scheduler_logger")
 
@@ -62,3 +63,5 @@ class Scheduler:
                                    reply_to_message_id=message_id,
                                    reply_markup=kb
                                    )
+        else:
+            logger.bind(name="scheduler_logger").warning(f"🚨 Неизвестный статус: {stage_id}")

@@ -1,21 +1,22 @@
-# Используем официальный образ Python
-FROM python:3.12
+FROM python:3.12-slim
 
-# Устанавливаем рабочую директорию внутри контейнера
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV POETRY_VERSION=2.0.1 \
+    POETRY_HOME=/opt/poetry \
+    PATH="/opt/poetry/bin:$PATH"
+
+RUN curl -sSL https://install.python-poetry.org | python3 - \
+    && poetry --version
+
 WORKDIR /app
+COPY . /app
 
-# Копируем файл зависимостей
-COPY requirements.txt .
+RUN poetry config virtualenvs.create false \
+    && poetry install --only main --no-interaction --no-root
 
-# Устанавливаем зависимости
-COPY ./packages /packages
-RUN pip install --no-cache-dir /packages/*
+EXPOSE 6379
 
-# Копируем все файлы проекта в контейнер
-COPY . .
-
-# Указываем порт, который будет использовать приложение
-EXPOSE 5000
-
-# Команда для запуска приложения
 CMD ["python", "main.py"]

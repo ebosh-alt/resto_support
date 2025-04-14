@@ -17,6 +17,7 @@ async def main() -> None:
         dp.include_router(router)
     dp.update.middleware(middleware.Logging())
     asyncio.create_task(start_scheduler())  # noqa
+    await bot.delete_webhook()
     await dp.start_polling(bot)
 
 

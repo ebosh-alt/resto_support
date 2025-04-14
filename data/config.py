@@ -9,10 +9,9 @@ config = Config.load()
 dp = Dispatcher()
 bot = Bot(config.telegram.bot_token)
 
-WAIT_TIME = 10  # Время ожидания дополнительных сообщений в секундах
+WAIT_TIME = 120  # Время ожидания дополнительных сообщений в секундах
 RESPONSE_TIME = "5 минут"  # Время ожидания ответа. Встраивается в request_sent
-# USERNAME_BOT = "@Restocrmhelp_bot"
-USERNAME_BOT = "@design_skill_bot"
+USERNAME_BOT = "@Restocrmhelp_bot"
 
 STATUSES_TASK: Dict[int, str] = {
     796: "новые задачи",

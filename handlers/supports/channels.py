@@ -54,7 +54,7 @@ async def handle_message(message: types.Message):
         task = Task(
             chat_id=chat_id,
             db_id=task_db.id,
-            chat_title=message.chat.title,
+            chat_title=message.chat.title or "Неизвестен",
             user_id=user_id,
             username=user_name,
             title=task_title,
@@ -97,7 +97,7 @@ async def wait_for_followup(key: str):
         task_db.stage_id = task_btx.stageId
         task_db.is_created = True
         await tasks.update(task_db)
-        logger.info(f"Задача {task_db.id} создана в битриксе")
+        logger.info(f"Задача {task_db.btx_id} создана в битриксе")
 
         if task_btx:
             if task.attachments:
