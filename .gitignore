@@ -59,6 +59,7 @@ build/
 
 data/database.db
 data/.env
+
 poetry.lock
 reports/*.pdf
 photos/*.jpg

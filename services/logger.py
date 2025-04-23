@@ -82,7 +82,7 @@ def set_logger():
         rotation="1 week",
         level="INFO",
         encoding="utf-8",
-        filter=make_filter("logger_json"),
+        filter=make_filter("*"),
     )
 
     logging.basicConfig(handlers=[InterceptHandler()], level=0, force=True)
