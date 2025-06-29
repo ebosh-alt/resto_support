@@ -37,12 +37,14 @@ class Scheduler:
                 if task.stage_id != task_btx.stageId:
                     task.stage_id = task_btx.stageId
                     job_id = f"task_{task.id}"
-
+                    thread_id = None
+                    if task.thread_id != 0:
+                        thread_id = task.thread_id
                     self.scheduler.add_job(
                         self.send_message,
                         trigger="date",
                         run_date=datetime.now(MOSCOW_TZ) + timedelta(seconds=10),
-                        args=[task.stage_id, task.id, task.chat_id, task.message_id],
+                        args=[task.stage_id, task.id, task.chat_id, task.message_id, thread_id],
                         id=job_id,
                     )
                     await tasks.update(task)
@@ -51,7 +53,7 @@ class Scheduler:
                     )
 
     @staticmethod
-    async def send_message(stage_id: int, task_id: int, chat_id: int, message_id: int):
+    async def send_message(stage_id: int, task_id: int, chat_id: int, message_id: int, thread_id: int | None):
         text = statuses_texts.get(stage_id, None)
         if text is not None:
             if stage_id == COMPLETE_TASK_ID:
@@ -59,6 +61,7 @@ class Scheduler:
             else:
                 kb = None
             await bot.send_message(chat_id=chat_id,
+                                   message_thread_id=thread_id,
                                    text=text.format(task_id=task_id),
                                    reply_to_message_id=message_id,
                                    reply_markup=kb

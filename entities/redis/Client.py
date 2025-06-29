@@ -15,7 +15,7 @@ class RedisClient:
             cls._instance.connection = redis.Redis(
                 host=config.redis.host,
                 port=config.redis.port,
-                decode_responses=True,  # Убедимся, что ответы будут строковыми
+                decode_responses=True,
             )
         return cls._instance
 

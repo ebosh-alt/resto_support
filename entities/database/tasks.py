@@ -9,13 +9,13 @@ logger = logging.getLogger(__name__)
 
 class Task(Base):
     __tablename__ = "tasks"
-
     __allow_unmapped__ = True
 
     id = Column(Integer, autoincrement=True, primary_key=True)
     title = Column(String)
     description = Column(String)
     chat_id = Column(BigInteger)
+    thread_id = Column(BigInteger)
     btx_id = Column(BigInteger, default=0)
     stage_id = Column(BigInteger, default=0)
     message_id = Column(BigInteger, default=0)
@@ -27,6 +27,8 @@ class Task(Base):
         return {"id": self.id,
                 "title": self.title,
                 "description": self.description,
+                "chat_id": self.chat_id,
+                "thread_id": self.thread_id,
                 "btx_id": self.btx_id,
                 "stage_id": self.stage_id,
                 "message_id": self.message_id,

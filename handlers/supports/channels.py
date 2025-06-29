@@ -37,15 +37,22 @@ async def handle_message(message: types.Message):
     text = message.text.replace(f"{USERNAME_BOT} ", "")
     if USERNAME_BOT in message.text:
         if Task.exists(f"{Task.REDIS_PREFIX}:{chat_id}:{user_id}"):
-            await message.reply(
+            return await message.reply(
                 texts.request_left
             )
-            return
+
         task_title = " ".join(text.split()[:10])
+        thread_id = 0
+        if message.reply_to_message:
+            text = f"{message.reply_to_message.text}\n\n{text}"
+        if message.is_topic_message:
+            thread_id = message.message_thread_id
+
         task_db = TaskDB(
             title=task_title,
             description=text,
             chat_id=message.chat.id,
+            thread_id=thread_id,
             message_id=message.message_id
         )
         await tasks.new(task_db)
@@ -53,6 +60,7 @@ async def handle_message(message: types.Message):
 
         task = Task(
             chat_id=chat_id,
+            thread_id=thread_id,
             db_id=task_db.id,
             chat_title=message.chat.title or "Неизвестен",
             user_id=user_id,
@@ -68,13 +76,14 @@ async def handle_message(message: types.Message):
         await message.reply(
             texts.request_adopted.format(task_id=task_db.id)
         )
-        await wait_for_followup(key=task.key)
+        return await wait_for_followup(key=task.key)
     else:
         task = Task.get(f"{Task.REDIS_PREFIX}:{chat_id}:{user_id}")
         if task:
             task.add_message(Message(text))
             task.description += f"{text}\n"
             task.save()
+        return None
 
 
 async def wait_for_followup(key: str):
@@ -84,12 +93,16 @@ async def wait_for_followup(key: str):
     task = Task.get(key)
     if task:
         task.title = f"№{task.db_id:09d}. {" ".join(task.description.split()[:10])}"
-        task.description += f"\nСсылка на главное сообщение: https://t.me/c/{str(task.chat_id).replace("-100", "")}/{task.message_id}"
+        if task.thread_id == 0:
+            link = f"https://t.me/c/{str(task.chat_id).replace("-100", "")}/{task.message_id}"
+        else:
+            link = f"https://t.me/c/{str(task.chat_id).replace("-100", "")}/{task.thread_id}/{task.message_id}"
+        task.description += f"\nСсылка на главное сообщение: {link}"
         task.save()
 
         client = ClientBitrix()
         task_btx = await client.create_task(task,
-                                            link=f"https://t.me/c/{str(task.chat_id).replace("-100", "")}/{task.message_id}",
+                                            link=link,
                                             chat_title=task.chat_title)
 
         task_db = await tasks.get(task.db_id)

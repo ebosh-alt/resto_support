@@ -14,11 +14,12 @@ class Task(BaseModel):
 
     REDIS_PREFIX = "task"
 
-    def __init__(self, chat_id: int, db_id: int, chat_title: str, user_id: int, username: str, title: str,
+    def __init__(self, chat_id: int, thread_id: int, db_id: int, chat_title: str, user_id: int, username: str, title: str,
                  description: str, message_id: int,
                  key: str = None):
         self.db_id = db_id
         self.chat_id = chat_id
+        self.thread_id = thread_id
         self.chat_title = chat_title
         self.user_id = user_id
         self.username = username
@@ -28,7 +29,7 @@ class Task(BaseModel):
         self.messages = []
         self.attachments = []
         self.created_at = datetime.now().isoformat()
-        super().__init__(key or f"{self.REDIS_PREFIX}:{chat_id}:{user_id}")
+        super().__init__(key or f"{self.REDIS_PREFIX}:{chat_id}:{thread_id}:{user_id}")
 
     def to_dict(self):
         """Конвертирует объект в словарь для Redis"""
@@ -36,6 +37,7 @@ class Task(BaseModel):
             "db_id": self.db_id,
             "chat_id": self.chat_id,
             "chat_title": self.chat_title,
+            "thread_id": self.thread_id,
             "user_id": self.user_id,
             "username": self.username,
             "title": self.title,
@@ -54,6 +56,7 @@ class Task(BaseModel):
             user_id=int(data["user_id"]),
             chat_title=data["chat_title"],
             chat_id=int(data["chat_id"]),
+            thread_id=int(data["thread_id"]),
             username=data["username"],
             title=data["title"],
             description=data["description"],
@@ -73,6 +76,7 @@ class Task(BaseModel):
             "key": self.key,
             "db_id": self.db_id,
             "chat_id": self.chat_id,
+            "thread_id": self.thread_id,
             "chat_title": self.chat_title,
             "user_id": self.user_id,
             "username": self.username,

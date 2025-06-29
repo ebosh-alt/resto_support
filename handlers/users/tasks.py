@@ -12,9 +12,9 @@ logger = logging.getLogger(__name__)
 
 @router.callback_query(F.data == "complete_task")
 async def complete_task(message: CallbackQuery):
-    id = message.message.chat.id
+    user_id = message.message.chat.id
     await bot.edit_message_text(
-        chat_id=id,
+        chat_id=user_id,
         message_id=message.message.message_id,
         text=complete_task_text,
     )
@@ -22,9 +22,9 @@ async def complete_task(message: CallbackQuery):
 
 @router.callback_query(F.data == "not_complete_task")
 async def not_complete_task(message: CallbackQuery):
-    id = message.message.chat.id
+    user_id = message.message.chat.id
     await bot.edit_message_text(
-        chat_id=id,
+        chat_id=user_id,
         message_id=message.message.message_id,
         text=not_complete_task_text,
     )

@@ -100,6 +100,7 @@ class ClientBitrix(BaseClient):
         if response.get("error"):
             return False
         task = response["result"]["task"]
+        # logger.info(json.dumps(task, indent=4, ensure_ascii=False))
         return ResponseTask(**task)
 
     async def get_task_user_field(self, id):

@@ -121,7 +121,7 @@ class RequestTask(BaseModel):
     TITLE: Optional[str]  # Название задачи
     DESCRIPTION: Optional[str] = None  # Описание задачи
     RESPONSIBLE_ID: Optional[str] = "8"
-    CREATED_BY: Optional[str] = "1"
+    CREATED_BY: Optional[str] = "52"
     FLOW_ID: Optional[int] = 18
     UF_AUTO_474459663205: Optional[str] = None
     UF_AUTO_370133723970: Optional[str] = None
