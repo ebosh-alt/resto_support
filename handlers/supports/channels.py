@@ -36,17 +36,17 @@ async def handle_message(message: types.Message):
     chat_id = message.chat.id
     text = message.text.replace(f"{USERNAME_BOT} ", "")
     if USERNAME_BOT in message.text:
-        if Task.exists(f"{Task.REDIS_PREFIX}:{chat_id}:{user_id}"):
+        thread_id = 0
+        if message.is_topic_message:
+            thread_id = message.message_thread_id
+        if Task.exists(f"{Task.REDIS_PREFIX}:{chat_id}:{thread_id}:{user_id}"):
             return await message.reply(
                 texts.request_left
             )
 
         task_title = " ".join(text.split()[:10])
-        thread_id = 0
         if message.reply_to_message:
             text = f"{message.reply_to_message.text}\n\n{text}"
-        if message.is_topic_message:
-            thread_id = message.message_thread_id
 
         task_db = TaskDB(
             title=task_title,
