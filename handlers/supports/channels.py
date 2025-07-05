@@ -97,6 +97,8 @@ async def wait_for_followup(key: str):
             link = f"https://t.me/c/{str(task.chat_id).replace("-100", "")}/{task.message_id}"
         else:
             link = f"https://t.me/c/{str(task.chat_id).replace("-100", "")}/{task.thread_id}/{task.message_id}"
+        if link[0] == "-":
+            link = link[1:]
         task.description += f"\nСсылка на главное сообщение: {link}"
         task.save()
 
