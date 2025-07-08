@@ -66,15 +66,15 @@ def make_filter(name):
 def set_logger():
     logger.remove(0)
 
-    logger.add(
-        sink=sys.stdout,
-        format=formatter_stdout,
-        level="INFO",
-        colorize=True,
-        backtrace=True,
-        diagnose=True,
-        filter=make_filter("*"),
-    )
+    # logger.add(
+    #     sink=sys.stdout,
+    #     format=formatter_stdout,
+    #     level="INFO",
+    #     colorize=True,
+    #     backtrace=True,
+    #     diagnose=True,
+    #     filter=make_filter("*"),
+    # )
 
     logger.add(
         "logger.json",
@@ -83,6 +83,14 @@ def set_logger():
         level="INFO",
         encoding="utf-8",
         filter=make_filter("*"),
+    )
+    logger.add(
+        "scheduler_logger.json",
+        format=formatter_json,
+        rotation="1 week",
+        level="INFO",
+        encoding="utf-8",
+        filter=make_filter("scheduler_logger"),
     )
 
     logging.basicConfig(handlers=[InterceptHandler()], level=0, force=True)

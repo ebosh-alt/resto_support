@@ -22,35 +22,40 @@ class Scheduler:
         self.scheduler = AsyncIOScheduler(timezone=MOSCOW_TZ)
 
     async def start(self):
-        logger.info("🟢 Старт Scheduler...")
+        logger.bind(name="scheduler_logger").info("🟢 Старт Scheduler...")
         self.scheduler.start()
 
     async def schedule_update(self):
         await self.work()
 
     async def work(self):
-        logger.info("🔄 Обновляем список задач")
+        logger.bind(name="scheduler_logger").info("🔄 Обновляем список задач")
         client = ClientBitrix()
         async for task in tasks:
-            if task.is_created:
-                task_btx = await client.get_task(task.btx_id)
-                if task.stage_id != task_btx.stageId:
-                    task.stage_id = task_btx.stageId
-                    job_id = f"task_{task.id}"
-                    thread_id = None
-                    if task.thread_id != 0:
-                        thread_id = task.thread_id
-                    self.scheduler.add_job(
-                        self.send_message,
-                        trigger="date",
-                        run_date=datetime.now(MOSCOW_TZ) + timedelta(seconds=10),
-                        args=[task.stage_id, task.id, task.chat_id, task.message_id, thread_id],
-                        id=job_id,
-                    )
-                    await tasks.update(task)
-                    logger.info(
-                        f"📨 Создана новая задача для id={task.btx_id}"
-                    )
+            try:
+                if task.is_created:
+                    task_btx = await client.get_task(task.btx_id)
+                    if task.stage_id != task_btx.stageId:
+                        task.stage_id = task_btx.stageId
+                        job_id = f"task_{task.id}"
+                        thread_id = None
+                        if task.thread_id != 0:
+                            thread_id = task.thread_id
+                        self.scheduler.add_job(
+                            self.send_message,
+                            trigger="date",
+                            run_date=datetime.now(MOSCOW_TZ) + timedelta(seconds=10),
+                            args=[task.stage_id, task.id, task.chat_id, task.message_id, thread_id],
+                            id=job_id,
+                        )
+                        await tasks.update(task)
+                        logger.bind(name="scheduler_logger").info(
+                            f"📨 Создана новая задача для id={task.btx_id}"
+                        )
+            except Exception as e:
+                logger.bind(name="scheduler_logger").warning(f"Не удалось обработать задачу {task.id}: {e}")
+                # и идём дальше по остальным задачам
+                continue
 
     @staticmethod
     async def send_message(stage_id: int, task_id: int, chat_id: int, message_id: int, thread_id: int | None):
